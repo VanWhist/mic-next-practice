@@ -52,7 +52,7 @@ class MockBackend:
 
     def handle(self, route):
         url = route.request.url
-        if "REPLACE_WITH_DEPLOYMENT_ID" in url:
+        if "AKfycbxbFOiI0" in url:
             if route.request.method == "POST":
                 body = json.loads(route.request.post_data)
                 self.posts.append(body)
