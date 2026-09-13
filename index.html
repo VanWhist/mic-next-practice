@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>MIC 次の練習</title>
+<style>
+html, body { margin: 0; padding: 0; background: #0B1420; min-height: 100%; }
+* { box-sizing: border-box; }
+input, textarea, select, button { font-family: inherit; }
+input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(0.7); cursor: pointer; }
+
+.app-shell { min-height: 100vh; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Hiragino Kaku Gothic ProN", "Noto Sans JP", sans-serif; color: #EAF1F8; }
+.container { max-width: 480px; margin: 0 auto; padding: 28px 20px 96px; }
+
+.header-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.app-title { font-size: 20px; font-weight: 700; letter-spacing: -0.02em; margin: 0; }
+.app-tag { font-size: 11px; color: #5C7086; }
+.refresh-btn { width: 28px; height: 28px; border-radius: 50%; border: 1px solid #26374E; background: transparent; color: #8CA0B8; font-size: 15px; display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; }
+
+.section { display: flex; flex-direction: column; gap: 14px; margin-top: 20px; }
+.section-title { font-size: 12px; color: #5C7086; margin: 6px 0 -4px; }
+.card { border-radius: 12px; padding: 14px; background: #131F30; border: 1px solid #26374E; }
+.empty-card { border-radius: 12px; padding: 22px 16px; text-align: center; font-size: 14px; line-height: 1.7; background: #131F30; border: 1px solid #26374E; color: #8CA0B8; }
+.notice { border-radius: 10px; padding: 10px 12px; font-size: 12px; line-height: 1.6; background: #2A1F0E; border: 1px solid #6B4A1E; color: #FFB870; }
+.flash { border-radius: 10px; padding: 10px 12px; font-size: 13px; background: #10242C; border: 1px solid #2E5D52; color: #7CD98A; }
+
+.hero { border-radius: 14px; padding: 18px 16px; background: #131F30; border: 1px solid #26374E; }
+.hero-label { font-size: 13px; color: #8CA0B8; }
+.hero-count { font-size: 40px; font-weight: 700; font-family: ui-monospace, monospace; color: #4CC3F0; line-height: 1.1; margin-top: 4px; }
+.hero-count small { font-size: 16px; color: #EAF1F8; margin-left: 4px; font-family: inherit; }
+.hero-sub { font-size: 11px; color: #5C7086; margin-top: 6px; }
+
+.plan-card { border-radius: 12px; padding: 14px; background: #1B2C42; border: 1px solid #2A5A75; }
+.plan-when { font-size: 11px; color: #8CA0B8; margin-bottom: 8px; }
+.plan-line { font-size: 15px; line-height: 1.6; }
+.plan-line b { color: #4CC3F0; font-weight: 600; font-size: 12px; margin-right: 4px; }
+.plan-actions { margin-top: 10px; display: flex; justify-content: flex-end; }
+.link-btn { background: transparent; border: 1px solid #26374E; color: #8CA0B8; border-radius: 8px; padding: 6px 12px; font-size: 12px; cursor: pointer; }
+
+.event-list { display: flex; flex-direction: column; gap: 8px; }
+.event-row { border-radius: 10px; padding: 12px; background: #131F30; border: 1px solid #26374E; color: #EAF1F8; text-align: left; width: 100%; display: flex; flex-direction: column; gap: 8px; }
+button.event-row { cursor: pointer; }
+button.event-row.open { border-color: #4CC3F0; }
+.event-top { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
+.event-date { font-size: 15px; font-weight: 700; }
+.event-meta { font-size: 12px; color: #8CA0B8; }
+.event-note { font-size: 11px; color: #5C7086; }
+.event-cta { font-size: 12px; color: #4CC3F0; font-weight: 600; white-space: nowrap; }
+.event-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.event-col { border-radius: 8px; padding: 8px; background: #0F1929; border: 1px solid #1E2E44; font-size: 12px; line-height: 1.5; min-width: 0; }
+.event-col-label { font-size: 10px; color: #5C7086; margin-bottom: 2px; }
+.event-col .muted { color: #5C7086; }
+
+.step-head { display: flex; align-items: center; gap: 8px; }
+.back-btn { background: #1B2C42; border: 1px solid #26374E; color: #EAF1F8; border-radius: 8px; padding: 6px 10px; font-size: 12px; cursor: pointer; }
+.step-event { font-size: 12px; color: #8CA0B8; }
+.question { font-size: 18px; font-weight: 700; line-height: 1.5; margin: 4px 0 0; }
+.question-sub { font-size: 12px; color: #8CA0B8; line-height: 1.6; }
+.choice-list { display: flex; flex-direction: column; gap: 8px; }
+.choice-btn { width: 100%; min-height: 52px; padding: 10px 14px; border-radius: 10px; font-size: 15px; font-weight: 600; text-align: left; line-height: 1.3; cursor: pointer; background: #1B2C42; color: #EAF1F8; border: 1px solid #26374E; display: flex; flex-direction: column; justify-content: center; }
+.choice-btn .choice-sub { font-size: 11px; font-weight: 400; color: #8CA0B8; margin-top: 2px; }
+.choice-btn.active { background: #4CC3F0; color: #062230; border-color: #4CC3F0; }
+.choice-btn.active .choice-sub { color: #0E3A4F; }
+.choice-sep { font-size: 11px; color: #5C7086; margin: 4px 0 -2px; }
+.picked { font-size: 13px; line-height: 1.6; border-radius: 10px; padding: 10px 12px; background: #131F30; border: 1px solid #26374E; }
+.picked b { color: #4CC3F0; font-size: 11px; font-weight: 600; margin-right: 4px; }
+
+.text-input, .note-textarea, .date-input, .select-input { width: 100%; border-radius: 8px; padding: 10px 12px; font-size: 15px; background: #1B2C42; border: 1px solid #26374E; color: #EAF1F8; outline: none; color-scheme: dark; }
+.note-textarea { resize: none; }
+.field-label { font-size: 12px; margin-bottom: 6px; display: block; color: #5C7086; }
+.field-error { font-size: 12px; color: #FFB870; margin-top: 6px; }
+
+.save-btn { width: 100%; padding: 13px 0; border-radius: 12px; font-size: 15px; font-weight: 600; border: none; cursor: pointer; background: #4CC3F0; color: #062230; }
+.save-btn:disabled { opacity: 0.6; cursor: default; }
+.danger-btn { background: transparent; border: 1px solid #6B4A1E; color: #FFB870; border-radius: 8px; padding: 6px 12px; font-size: 12px; cursor: pointer; }
+.chip-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.chip-btn { padding: 10px 4px; border-radius: 8px; font-size: 13px; font-weight: 600; text-align: center; cursor: pointer; background: #1B2C42; color: #EAF1F8; border: 1px solid #26374E; }
+.chip-btn.active { background: #4CC3F0; color: #062230; border-color: #4CC3F0; }
+</style>
+</head>
+<body>
+<div class="app-shell"><div class="container" id="app"></div></div>
+<script>
+/* ============================================================
+   MIC 次の練習（第1版）
+   「ウォータージャンプ、あと◯日」を先に見せて、次の練習で良くしたいことを1つ、
+   それを何で確かめるかを1つ決めてもらう。
+
+   第1版で意図して持たないもの（仕様で除外。足すときは必ず相談する）:
+   - シーズン合計・技ごとの本数配分・日別の必要本数（本数は上限であって目標ではない）
+   - 達成率・連続達成・ランキング・未達の表示
+   - 未実施分の繰り越し（予定と実績がズレたら作り直すのが基本動作）
+   - 保護者の入力・参加者一覧・Googleカレンダー連携
+   ============================================================ */
+
+/* ---- APIの場所 ----
+   NEXT_API_URL: このアプリ用のApps Script Web App（練習日・目標）。デプロイ後に差し替える。
+   AIRLOG_API_URL: MICエアlog（mic-karte/karte/index.html の AIRLOG_API_URL と同じ）。読み取りのみ。 */
+var NEXT_API_URL = "https://script.google.com/macros/s/REPLACE_WITH_DEPLOYMENT_ID/exec";
+var AIRLOG_API_URL = "https://script.google.com/macros/s/AKfycbyH7nX_nhgJ4z7W_QCLGnZqwLp8GkCdRzof2RaaR3fLK2gKVpeF8P0lATS2uzzKJhP0ag/exec";
+/* 林遼真・見瀬クレアはNTエアlog側で記録している（mic-air-log の CROSS_TEAM_ATHLETES と同じ対応表）。 */
+var NT_API_URL = "https://script.google.com/macros/s/AKfycbwhxPSdRvM67Bf7RO6gDUoZxxvGipDNGs7Up5BXUvbqulr90wjGzhZXtV2VQERyP3rAYw/exec";
+var CROSS_TEAM_ATHLETES = { "a86206408": "a86206408", "a1d20f6b4": "adeb92004" };
+
+/* 目標は次の1〜2回分だけ持つ。これより先の練習日は一覧に出すだけで、目標は決めさせない。 */
+var PLANNABLE_EVENTS = 2;
+/* 「この前の練習」に出す過去の練習日の件数と、さかのぼる日数。 */
+var RECENT_PAST_EVENTS = 3;
+var RECENT_PAST_DAYS = 21;
+/* 選択肢に出す、最近エアlogに記録した技の数。 */
+var RECENT_TRICKS = 6;
+
+var CONSULT_LABEL = "コーチと相談したい";
+var FREE_KEY = "__free__";
+var CONSULT_KEY = "__consult__";
+var CHECK_EXAMPLES = ["成功する本数が増える", "踏切のタイミングが合う", "着地が安定する", "コーチにOKと言われる"];
+/* 「コーチと相談したい」を選んだときだけ、確かめることにもこの選択肢を足す。 */
+var CHECK_CONSULT = "練習でコーチと決める";
+var KUBUN = ["午前", "午後", "終日"];
+var FACILITIES = ["O-air", "S-air", "さのさか", "WJM"];
+
+/* 技名はMICエアlog（mic-air-log/index.html の TRICKS / LEGACY_TRICKS）の表示名に合わせる。 */
+var TRICK_LABELS = {
+straight_jump: "ストレートジャンプ", side_jump: "体側ジャンプ", hand_set_jump: "手決めジャンプ", tuck_jump: "タックジャンプ", pike_jump: "パイクジャンプ",
+rot_3: "360", rot_7: "720", rot_10: "1080",
+oax_3: "オフアクシス360", oax_7: "オフアクシス720", oax_10: "オフアクシス1080", oax_14: "オフアクシス1440",
+inv_bc: "バックフリップ", inv_bt: "バックタック", inv_bp: "バックパイク", inv_bl: "バックレイアウト", inv_bf: "バックフル", inv_bdf: "バックダブルフル", inv_btf: "バックトリプルフル",
+inv_fc: "フロントフリップ", inv_ft: "フロントタック", inv_fp: "フロントパイク", inv_ff: "フロントフル",
+loop_l: "ループ",
+up_twister: "ツイスター", up_spread: "スプレッド", up_daffy: "ダフィー", up_ironcross: "アイアンクロス", up_backscratcher: "バックスクラッチャー", up_mulekick: "ミュールキック", up_kosak: "コサック", up_zudnick: "ズドニック",
+airtime: "10本ジャンプ",
+inv_bpt: "バックタック/パイク", inv_fpt: "フロントタック/パイク"
+};
+function trickLabel(id) { return TRICK_LABELS[id] || id; }
+
+/* ---- URLパラメータ ----
+   ?a=<athleteId> 選手本人の画面（MICエアlogと同じ方式。ログインではない）
+   ?coach=1       コーチの管理画面（練習日の入力） */
+function queryParam(name) {
+try { var m = location.search.match(new RegExp("[?&]" + name + "=([^&]*)")); return m ? decodeURIComponent(m[1]) : ""; }
+catch (e) { return ""; }
+}
+var ATHLETE_ID = queryParam("a");
+var COACH_MODE = queryParam("coach") === "1";
+var COACH_KEY_STORAGE = "micNextPracticeCoachKey";
+
+/* ---- 状態 ---- */
+var S = {
+eventsStatus: "loading", // loading | loaded | error
+airlogStatus: "loading",
+events: [],
+plans: [],
+athletes: [],
+waterRecords: [],
+view: "top", // top | improve | check
+eventId: null,
+improveKey: null, improveText: "",
+checkKey: null, checkText: "",
+error: "",
+saving: false,
+flash: "",
+coach: { key: "", editingId: null, date: "", kubun: "午前", place: "", note: "", busy: false, error: "", flash: "" }
+};
+
+/* ---- 共通 ---- */
+function escHtml(s) {
+return String(s == null ? "" : s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#39;");
+}
+function pad2(n) { return (n < 10 ? "0" : "") + n; }
+function todayStr() { var d = new Date(); return d.getFullYear() + "-" + pad2(d.getMonth() + 1) + "-" + pad2(d.getDate()); }
+function daysBetween(fromStr, toStr) {
+var a = fromStr.split("-"), b = toStr.split("-");
+return Math.round((Date.UTC(+b[0], +b[1] - 1, +b[2]) - Date.UTC(+a[0], +a[1] - 1, +a[2])) / 86400000);
+}
+function formatDate(dateStr) {
+var p = dateStr.split("-");
+if (p.length !== 3) return dateStr;
+var wd = "日月火水木金土".charAt(new Date(+p[0], +p[1] - 1, +p[2]).getDay());
+return (+p[1]) + "/" + (+p[2]) + "（" + wd + "）";
+}
+function eventMeta(ev) { return [ev.kubun, ev.place].filter(Boolean).join("・"); }
+
+function apiGet(url) {
+return fetch(url).then(function (res) { return res.json(); });
+}
+function apiPost(payload) {
+return fetch(NEXT_API_URL, {
+method: "POST",
+headers: { "Content-Type": "text/plain;charset=utf-8" },
+body: JSON.stringify(payload)
+}).then(function (res) { return res.json(); }).then(function (data) {
+if (!data || !data.ok) throw new Error((data && data.error) || "保存に失敗しました");
+return data;
+});
+}
+
+/* ---- 読み込み ---- */
+function loadEvents() {
+S.eventsStatus = "loading";
+var url = NEXT_API_URL + (ATHLETE_ID ? "?a=" + encodeURIComponent(ATHLETE_ID) : "");
+return apiGet(url).then(function (data) {
+if (!data || !data.ok) throw new Error((data && data.error) || "読み込みに失敗しました");
+S.events = data.events || [];
+S.plans = data.plans || [];
+S.eventsStatus = "loaded";
+render();
+}).catch(function (err) {
+console.warn("練習日の読み込みに失敗しました", err);
+S.eventsStatus = "error";
+render();
+});
+}
+
+function ntRecordsFor(micId) {
+var ntId = CROSS_TEAM_ATHLETES[micId];
+if (!ntId) return Promise.resolve([]);
+return apiGet(NT_API_URL).then(function (data) {
+return (data.records || []).filter(function (e) { return e.athlete === ntId; }).map(function (e) {
+return { athlete: micId, category: "water", date: e.date, rows: (e.rows || []).map(function (r) {
+var total = r.reps !== undefined ? (Number(r.reps) || 0) : ((Number(r.success) || 0) + (Number(r.fail) || 0));
+return { trickId: r.trickId, total: total };
+}) };
+});
+}).catch(function (err) { console.warn("NTエアlogの読み込みに失敗しました", err); return []; });
+}
+
+function loadAirlog() {
+S.airlogStatus = "loading";
+return Promise.all([apiGet(AIRLOG_API_URL), ntRecordsFor(ATHLETE_ID)]).then(function (res) {
+var data = res[0] || {};
+S.athletes = (data.athletes || []).map(function (a) { return { id: String(a.id), name: a.name }; });
+var own = (data.records || []).filter(function (e) { return String(e.athlete) === ATHLETE_ID && e.category === "water"; }).map(function (e) {
+return { date: String(e.date || ""), rows: (e.rows || []).map(function (r) { return { trickId: r.trickId, total: (Number(r.success) || 0) + (Number(r.fail) || 0) }; }) };
+});
+S.waterRecords = own.concat(res[1]);
+S.airlogStatus = "loaded";
+render();
+}).catch(function (err) {
+console.warn("MICエアlogの読み込みに失敗しました", err);
+S.airlogStatus = "error";
+render();
+});
+}
+
+/* ---- 選手・練習日・目標の取り出し ---- */
+function athleteName() {
+var a = S.athletes.filter(function (x) { return x.id === ATHLETE_ID; })[0];
+return a ? a.name : "";
+}
+/* 名簿が読めて、?a= が名簿にない選手IDだと分かった状態。 */
+function athleteLinkBroken() { return S.airlogStatus === "loaded" && !athleteName(); }
+
+function upcomingEvents() { var t = todayStr(); return S.events.filter(function (ev) { return ev.date >= t; }); }
+function recentPastEvents() {
+var t = todayStr();
+return S.events.filter(function (ev) { return ev.date < t && daysBetween(ev.date, t) <= RECENT_PAST_DAYS; }).slice(-RECENT_PAST_EVENTS).reverse();
+}
+/* 「あと◯日」は残りの練習日の数（同じ日に午前・午後があっても1日と数える）。 */
+function remainingPracticeDays() {
+var seen = {};
+upcomingEvents().forEach(function (ev) { seen[ev.date] = true; });
+return Object.keys(seen).length;
+}
+function isPlannable(eventId) {
+return upcomingEvents().slice(0, PLANNABLE_EVENTS).some(function (ev) { return ev.eventId === eventId; });
+}
+function planFor(eventId) {
+var list = S.plans.filter(function (p) { return p.eventId === eventId; });
+return list.length ? list[list.length - 1] : null;
+}
+function eventById(eventId) { return S.events.filter(function (ev) { return ev.eventId === eventId; })[0] || null; }
+
+/* 最近エアlog（ウォータージャンプ）に記録した技を、新しい順に重複なしで取り出す。 */
+function recentTricks() {
+var sorted = S.waterRecords.slice().sort(function (a, b) { return a.date < b.date ? 1 : a.date > b.date ? -1 : 0; });
+var seen = {}, out = [];
+sorted.forEach(function (rec) {
+rec.rows.forEach(function (r) {
+if (!r.trickId || r.trickId === "airtime" || seen[r.trickId] || out.length >= RECENT_TRICKS) return;
+seen[r.trickId] = true;
+out.push({ trickId: r.trickId, lastDate: rec.date });
+});
+});
+return out;
+}
+
+/* その日のエアlogの実績（技ごとの本数を合算）。表示するだけで、目標と照らし合わせた判定はしない。 */
+function actualFor(dateStr) {
+var byTrick = {}, order = [];
+S.waterRecords.filter(function (rec) { return rec.date === dateStr; }).forEach(function (rec) {
+rec.rows.forEach(function (r) {
+if (!r.trickId) return;
+if (!byTrick.hasOwnProperty(r.trickId)) { byTrick[r.trickId] = 0; order.push(r.trickId); }
+byTrick[r.trickId] += r.total;
+});
+});
+return order.map(function (id) { return { trickId: id, total: byTrick[id] }; });
+}
+
+/* ---- 選手の操作 ---- */
+function openEvent(eventId) {
+if (!isPlannable(eventId)) return;
+S.view = "improve";
+S.eventId = eventId;
+S.improveKey = null; S.improveText = "";
+S.checkKey = null; S.checkText = "";
+S.error = ""; S.flash = "";
+render();
+window.scrollTo(0, 0);
+}
+function backToTop() { S.view = "top"; S.eventId = null; S.error = ""; render(); window.scrollTo(0, 0); }
+function selectImprove(key) { S.improveKey = key; S.error = ""; render(); if (key === FREE_KEY) focusInput("improve-text"); }
+function selectCheck(key) { S.checkKey = key; S.error = ""; render(); if (key === FREE_KEY) focusInput("check-text"); }
+function setImproveText(v) { S.improveText = v; }
+function setCheckText(v) { S.checkText = v; }
+function focusInput(id) { var el = document.getElementById(id); if (el) el.focus(); }
+
+function improveValue() {
+if (S.improveKey === CONSULT_KEY) return CONSULT_LABEL;
+if (S.improveKey === FREE_KEY) return S.improveText.trim();
+return S.improveKey ? trickLabel(S.improveKey) : "";
+}
+function checkValue() {
+if (S.checkKey === FREE_KEY) return S.checkText.trim();
+return S.checkKey || "";
+}
+
+function goCheck() {
+if (!S.improveKey) { S.error = "1つ選んでね"; render(); return; }
+if (!improveValue()) { S.error = "良くしたいことを書いてから進んでね"; render(); focusInput("improve-text"); return; }
+S.view = "check"; S.error = "";
+render();
+window.scrollTo(0, 0);
+}
+function backToImprove() { S.view = "improve"; S.error = ""; render(); }
+
+function savePlan() {
+if (S.saving) return;
+if (!S.checkKey) { S.error = "1つ選んでね"; render(); return; }
+if (!checkValue()) { S.error = "確かめることを書いてから保存してね"; render(); focusInput("check-text"); return; }
+S.saving = true; S.error = "";
+render();
+apiPost({ type: "savePlan", athleteId: ATHLETE_ID, eventId: S.eventId, improve: improveValue(), check: checkValue() }).then(function (data) {
+var plan = data.plan;
+S.plans = S.plans.filter(function (p) { return p.eventId !== plan.eventId; }).concat([plan]);
+S.saving = false;
+S.flash = "保存しました";
+S.view = "top"; S.eventId = null;
+render();
+window.scrollTo(0, 0);
+}).catch(function (err) {
+S.saving = false;
+S.error = "保存できませんでした。電波を確かめて、もう一度押してね（" + err.message + "）";
+render();
+});
+}
+
+/* ---- 選手画面の描画 ---- */
+function renderHeader(sub) {
+return '<div class="header-row"><div><h1 class="app-title">次の練習</h1><div class="app-tag">' + escHtml(sub) + '</div></div>' +
+'<button class="refresh-btn" aria-label="更新" onclick="reloadAll()">↻</button></div>';
+}
+function reloadAll() { S.flash = ""; loadEvents(); if (!COACH_MODE) loadAirlog(); render(); }
+
+function renderPlanLines(plan) {
+return '<div class="plan-line"><b>次の練習</b>' + escHtml(plan.improve) + '</div>' +
+'<div class="plan-line"><b>確かめること</b>' + escHtml(plan.check) + '</div>';
+}
+
+function renderActualCol(ev) {
+if (ev.date > todayStr()) return "";
+var body;
+if (S.airlogStatus === "loading") body = '<span class="muted">読み込み中…</span>';
+else if (S.airlogStatus === "error") body = '<span class="muted">エアlogを読めませんでした</span>';
+else {
+var actual = actualFor(ev.date);
+body = actual.length
+? actual.map(function (a) { return escHtml(trickLabel(a.trickId)) + " " + a.total + "本"; }).join("<br>")
+: '<span class="muted">エアlogの記録はまだありません</span>';
+}
+return '<div class="event-col" data-testid="actual"><div class="event-col-label">エアlogの記録</div>' + body + '</div>';
+}
+
+function renderEventRow(ev, idx) {
+var plan = planFor(ev.eventId);
+var plannable = idx < PLANNABLE_EVENTS;
+var head = '<div class="event-top"><div><div class="event-date">' + escHtml(formatDate(ev.date)) + '</div>' +
+'<div class="event-meta">' + escHtml(eventMeta(ev)) + '</div></div>' +
+(plannable ? '<span class="event-cta">' + (plan ? "作り直す ›" : "決める ›") + '</span>' : "") + '</div>' +
+(ev.note ? '<div class="event-note">' + escHtml(ev.note) + '</div>' : "");
+var planCol = plan
+? '<div class="event-col"><div class="event-col-label">決めたこと</div>' + escHtml(plan.improve) + '<br><span class="muted">確かめる：</span>' + escHtml(plan.check) + '</div>'
+: "";
+var actualCol = renderActualCol(ev);
+var cols = (planCol || actualCol) ? '<div class="event-cols">' + (planCol || '<div class="event-col"><div class="event-col-label">決めたこと</div><span class="muted">なし</span></div>') + (actualCol || '<div></div>') + '</div>' : "";
+if (!plannable) return '<div class="event-row" data-testid="event-row">' + head + cols + '</div>';
+return '<button class="event-row open" data-testid="event-row" onclick="openEvent(\'' + escHtml(ev.eventId) + '\')">' + head + cols + '</button>';
+}
+
+function renderPastRow(ev) {
+var plan = planFor(ev.eventId);
+var planCol = '<div class="event-col"><div class="event-col-label">決めたこと</div>' +
+(plan ? escHtml(plan.improve) + '<br><span class="muted">確かめる：</span>' + escHtml(plan.check) : '<span class="muted">なし</span>') + '</div>';
+return '<div class="event-row" data-testid="past-row"><div class="event-top"><div><div class="event-date">' + escHtml(formatDate(ev.date)) + '</div>' +
+'<div class="event-meta">' + escHtml(eventMeta(ev)) + '</div></div></div>' +
+'<div class="event-cols">' + planCol + renderActualCol(ev) + '</div></div>';
+}
+
+function renderTop() {
+var html = renderHeader(athleteName() ? athleteName() + " さん" : "ウォータージャンプ");
+html += '<div class="section">';
+if (S.flash) html += '<div class="flash" data-testid="flash">' + escHtml(S.flash) + '</div>';
+if (S.airlogStatus === "error") html += '<div class="notice">エアlogを読み込めませんでした。技の候補と記録は、右上の↻で読み直せます。</div>';
+
+if (S.eventsStatus === "loading") return html + '<div class="empty-card">読み込み中…</div></div>';
+if (S.eventsStatus === "error") return html + '<div class="empty-card">練習日を読み込めませんでした。<br>電波を確かめて、右上の↻を押してね。</div></div>';
+
+var upcoming = upcomingEvents();
+/* 0件のときは「あと0日」と出さない（未登録なのか、シーズンが終わったのか区別できないため）。 */
+if (upcoming.length) {
+html += '<div class="hero" data-testid="hero"><div class="hero-label">ウォータージャンプ、あと</div>' +
+'<div class="hero-count">' + remainingPracticeDays() + '<small>日</small></div>' +
+'<div class="hero-sub">これからの練習日の数です（コーチが登録した日）</div></div>';
+}
+
+if (!upcoming.length) {
+html += '<div class="empty-card" data-testid="no-events">これからの練習日は、まだ登録されていません。<br>コーチが登録すると、ここに出ます。</div>';
+} else {
+var next = upcoming[0];
+var nextPlan = planFor(next.eventId);
+if (nextPlan) {
+html += '<div class="plan-card" data-testid="next-plan"><div class="plan-when">' + escHtml(formatDate(next.date) + " " + eventMeta(next)) + '</div>' +
+renderPlanLines(nextPlan) +
+'<div class="plan-actions"><button class="link-btn" onclick="openEvent(\'' + escHtml(next.eventId) + '\')">作り直す</button></div></div>';
+} else {
+html += '<button class="save-btn" data-testid="next-cta" onclick="openEvent(\'' + escHtml(next.eventId) + '\')">次の練習（' + escHtml(formatDate(next.date)) + '）で何を良くする？</button>';
+}
+html += '<div class="section-title">これからの練習日</div><div class="event-list">' + upcoming.map(renderEventRow).join("") + '</div>';
+}
+
+var past = recentPastEvents();
+if (past.length) html += '<div class="section-title">この前の練習</div><div class="event-list">' + past.map(renderPastRow).join("") + '</div>';
+return html + '</div>';
+}
+
+function choiceButton(key, label, sub, active, handler) {
+return '<button class="choice-btn' + (active ? " active" : "") + '" data-testid="choice" data-key="' + escHtml(key) + '" onclick="' + handler + '(\'' + escHtml(key) + '\')">' +
+escHtml(label) + (sub ? '<span class="choice-sub">' + escHtml(sub) + '</span>' : "") + '</button>';
+}
+
+function renderStepHead(ev, backHandler) {
+return '<div class="step-head"><button class="back-btn" onclick="' + backHandler + '()">‹ 戻る</button>' +
+'<div class="step-event">' + escHtml(formatDate(ev.date) + " " + eventMeta(ev)) + '</div></div>';
+}
+
+function renderImprove() {
+var ev = eventById(S.eventId);
+if (!ev) { S.view = "top"; return renderTop(); }
+var html = renderHeader(athleteName() ? athleteName() + " さん" : "ウォータージャンプ") + '<div class="section">' + renderStepHead(ev, "backToTop");
+html += '<h2 class="question">次の練習で、いちばん良くしたいことは？</h2>';
+html += '<div class="question-sub">1つだけ選んでね。</div>';
+
+var choices = '';
+if (S.airlogStatus === "loading") choices += '<div class="question-sub">エアlogから最近の技を読み込み中…</div>';
+else if (S.airlogStatus === "loaded") {
+var tricks = recentTricks();
+if (tricks.length) {
+choices += '<div class="choice-sep">最近エアlogに記録した技</div>';
+choices += tricks.map(function (t) { return choiceButton(t.trickId, trickLabel(t.trickId), "最後の記録 " + formatDate(t.lastDate), S.improveKey === t.trickId, "selectImprove"); }).join("");
+} else {
+choices += '<div class="question-sub">最近のエアlogの記録が見つかりませんでした。</div>';
+}
+}
+choices += '<div class="choice-sep">ほかの決め方</div>';
+choices += choiceButton(CONSULT_KEY, CONSULT_LABEL, "練習のときにコーチと一緒に決める", S.improveKey === CONSULT_KEY, "selectImprove");
+choices += choiceButton(FREE_KEY, "自分で書く", "技の名前でなくてもOK", S.improveKey === FREE_KEY, "selectImprove");
+html += '<div class="choice-list">' + choices + '</div>';
+
+if (S.improveKey === FREE_KEY) {
+html += '<div><label class="field-label" for="improve-text">良くしたいこと</label>' +
+'<input id="improve-text" class="text-input" maxlength="100" placeholder="例：バックフルの踏切" value="' + escHtml(S.improveText) + '" oninput="setImproveText(this.value)"></div>';
+}
+if (S.error) html += '<div class="field-error" data-testid="error">' + escHtml(S.error) + '</div>';
+html += '<button class="save-btn" data-testid="next-btn" onclick="goCheck()">次へ</button>';
+return html + '</div>';
+}
+
+function renderCheck() {
+var ev = eventById(S.eventId);
+if (!ev) { S.view = "top"; return renderTop(); }
+var html = renderHeader(athleteName() ? athleteName() + " さん" : "ウォータージャンプ") + '<div class="section">' + renderStepHead(ev, "backToImprove");
+html += '<div class="picked"><b>次の練習</b>' + escHtml(improveValue()) + '</div>';
+html += '<h2 class="question">それができたと、何を見て分かる？</h2>';
+html += '<div class="question-sub">1つだけ決めてね。同じ技でも、覚えたいのか・直したいのか・安定させたいのかで、見るところが変わります。</div>';
+var options = CHECK_EXAMPLES.slice();
+if (S.improveKey === CONSULT_KEY) options.push(CHECK_CONSULT);
+var choices = options.map(function (o) { return choiceButton(o, o, "", S.checkKey === o, "selectCheck"); }).join("");
+choices += choiceButton(FREE_KEY, "自分で書く", "", S.checkKey === FREE_KEY, "selectCheck");
+html += '<div class="choice-list">' + choices + '</div>';
+if (S.checkKey === FREE_KEY) {
+html += '<div><label class="field-label" for="check-text">確かめること</label>' +
+'<input id="check-text" class="text-input" maxlength="100" placeholder="例：動画で見て、腕が先に回っていない" value="' + escHtml(S.checkText) + '" oninput="setCheckText(this.value)"></div>';
+}
+if (S.error) html += '<div class="field-error" data-testid="error">' + escHtml(S.error) + '</div>';
+html += '<button class="save-btn" data-testid="save-btn" onclick="savePlan()"' + (S.saving ? " disabled" : "") + '>' + (S.saving ? "保存中…" : "保存する") + '</button>';
+return html + '</div>';
+}
+
+function renderAthleteApp() {
+if (!ATHLETE_ID) {
+return renderHeader("ウォータージャンプ") + '<div class="section"><div class="empty-card" data-testid="no-athlete">この画面は、選手ごとの専用リンクから開いてください。<br>リンクが分からないときはコーチに聞いてね。</div></div>';
+}
+if (athleteLinkBroken()) {
+return renderHeader("ウォータージャンプ") + '<div class="section"><div class="empty-card" data-testid="broken-link">このリンクの選手が見つかりませんでした。<br>コーチに正しいリンクを聞いてね。</div></div>';
+}
+if (S.view === "improve") return renderImprove();
+if (S.view === "check") return renderCheck();
+return renderTop();
+}
+
+/* ============================================================
+   コーチの管理画面（?coach=1）: 練習日の追加・修正・削除だけ。
+   書き込みはApps ScriptのCOACH_KEYと照合する。キーはこの端末にだけ保存する。
+   ============================================================ */
+function storedCoachKey() { try { return localStorage.getItem(COACH_KEY_STORAGE) || ""; } catch (e) { return ""; } }
+function storeCoachKey(v) { try { localStorage.setItem(COACH_KEY_STORAGE, v); } catch (e) { /* 保存できない端末では毎回入力 */ } }
+
+function coachSet(field, value) { S.coach[field] = value; if (field === "kubun") render(); }
+function coachResetForm() { S.coach.editingId = null; S.coach.date = ""; S.coach.kubun = "午前"; S.coach.place = ""; S.coach.note = ""; }
+function coachEdit(eventId) {
+var ev = eventById(eventId);
+if (!ev) return;
+S.coach.editingId = ev.eventId; S.coach.date = ev.date; S.coach.kubun = ev.kubun || "午前"; S.coach.place = ev.place; S.coach.note = ev.note;
+S.coach.error = ""; S.coach.flash = "";
+render();
+window.scrollTo(0, 0);
+}
+function coachCancel() { coachResetForm(); S.coach.error = ""; render(); }
+
+function coachSubmit(type, extra) {
+var c = S.coach;
+if (c.busy) return;
+var key = (document.getElementById("coach-key") || {}).value || c.key;
+if (!key) { c.error = "コーチ用キーを入れてください"; render(); return; }
+var payload = { type: type, coachKey: key };
+Object.keys(extra).forEach(function (k) { payload[k] = extra[k]; });
+c.busy = true; c.error = ""; c.flash = "";
+render();
+return apiPost(payload).then(function (data) {
+c.key = key; storeCoachKey(key);
+S.events = data.events || S.events;
+c.busy = false;
+c.flash = type === "deleteEvent" ? "削除しました" : "保存しました";
+coachResetForm();
+render();
+}).catch(function (err) {
+c.busy = false;
+c.error = err.message;
+render();
+});
+}
+function coachSave() {
+var c = S.coach;
+if (!/^\d{4}-\d{2}-\d{2}$/.test(c.date)) { c.error = "日付を入れてください"; render(); return; }
+var fields = { date: c.date, kubun: c.kubun, place: c.place.trim(), note: c.note.trim() };
+if (c.editingId) fields.eventId = c.editingId;
+coachSubmit(c.editingId ? "updateEvent" : "addEvent", fields);
+}
+function coachDelete(eventId) {
+var ev = eventById(eventId);
+if (!ev || !window.confirm(formatDate(ev.date) + " " + eventMeta(ev) + " を削除しますか？")) return;
+coachSubmit("deleteEvent", { eventId: eventId });
+}
+
+function renderCoachApp() {
+var c = S.coach;
+var html = renderHeader("コーチ用・練習日の入力") + '<div class="section">';
+html += '<div class="card"><label class="field-label" for="coach-key">コーチ用キー（この端末に保存されます）</label>' +
+'<input id="coach-key" class="text-input" type="password" autocomplete="off" value="' + escHtml(c.key) + '" oninput="coachSet(\'key\', this.value)"></div>';
+
+html += '<div class="card" style="display:flex;flex-direction:column;gap:12px">' +
+'<div class="section-title" style="margin:0">' + (c.editingId ? "練習日を直す" : "練習日を追加") + '</div>' +
+'<div><label class="field-label" for="coach-date">日付</label><input id="coach-date" class="date-input" type="date" value="' + escHtml(c.date) + '" oninput="coachSet(\'date\', this.value)"></div>' +
+'<div><span class="field-label">区分</span><div class="chip-grid">' + KUBUN.map(function (k) {
+return '<button class="chip-btn' + (c.kubun === k ? " active" : "") + '" onclick="coachSet(\'kubun\', \'' + k + '\')">' + k + '</button>';
+}).join("") + '</div></div>' +
+'<div><label class="field-label" for="coach-place">場所</label><input id="coach-place" class="text-input" list="facility-list" maxlength="100" value="' + escHtml(c.place) + '" oninput="coachSet(\'place\', this.value)">' +
+'<datalist id="facility-list">' + FACILITIES.map(function (f) { return '<option value="' + escHtml(f) + '">'; }).join("") + '</datalist></div>' +
+'<div><label class="field-label" for="coach-note">備考</label><input id="coach-note" class="text-input" maxlength="100" value="' + escHtml(c.note) + '" oninput="coachSet(\'note\', this.value)"></div>' +
+(c.error ? '<div class="field-error">' + escHtml(c.error) + '</div>' : "") +
+(c.flash ? '<div class="flash">' + escHtml(c.flash) + '</div>' : "") +
+'<button class="save-btn" onclick="coachSave()"' + (c.busy ? " disabled" : "") + '>' + (c.busy ? "送信中…" : (c.editingId ? "直して保存" : "追加する")) + '</button>' +
+(c.editingId ? '<button class="link-btn" onclick="coachCancel()">やめる</button>' : "") +
+'</div>';
+
+if (S.eventsStatus === "loading") return html + '<div class="empty-card">読み込み中…</div></div>';
+if (S.eventsStatus === "error") return html + '<div class="empty-card">練習日を読み込めませんでした。↻で読み直してください。</div></div>';
+var t = todayStr();
+var list = S.events.filter(function (ev) { return ev.date >= t || daysBetween(ev.date, t) <= RECENT_PAST_DAYS; });
+html += '<div class="section-title">登録済みの練習日（' + upcomingEvents().length + '件がこれから）</div>';
+if (!list.length) return html + '<div class="empty-card">まだ登録されていません。</div></div>';
+html += '<div class="event-list">' + list.map(function (ev) {
+return '<div class="event-row"' + (ev.date < t ? ' style="opacity:.6"' : "") + '><div class="event-top"><div><div class="event-date">' + escHtml(formatDate(ev.date)) + '</div>' +
+'<div class="event-meta">' + escHtml(eventMeta(ev)) + '</div>' + (ev.note ? '<div class="event-note">' + escHtml(ev.note) + '</div>' : "") + '</div>' +
+'<div style="display:flex;gap:6px"><button class="link-btn" onclick="coachEdit(\'' + escHtml(ev.eventId) + '\')">直す</button>' +
+'<button class="danger-btn" onclick="coachDelete(\'' + escHtml(ev.eventId) + '\')">削除</button></div></div></div>';
+}).join("") + '</div>';
+return html + '</div>';
+}
+
+/* ---- 描画 ---- */
+function render() {
+var app = document.getElementById("app");
+/* 入力中の再描画でカーソルが飛ばないよう、フォーカス中の入力欄を描画後に戻す。 */
+var active = document.activeElement;
+var activeId = active && active.id && (active.tagName === "INPUT" || active.tagName === "TEXTAREA") ? active.id : "";
+app.innerHTML = COACH_MODE ? renderCoachApp() : renderAthleteApp();
+if (activeId) { var el = document.getElementById(activeId); if (el) { el.focus(); try { el.setSelectionRange(el.value.length, el.value.length); } catch (e) { /* type=date等は非対応 */ } } }
+}
+
+if (COACH_MODE) S.coach.key = storedCoachKey();
+render();
+loadEvents();
+if (!COACH_MODE && ATHLETE_ID) loadAirlog();
+</script>
+</body>
+</html>
